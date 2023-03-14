@@ -10,7 +10,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 
-TESTPOST = 'Тестовый пост тестового пользователя в тестовой группе'
+TESTPOST = 'Тестовый пост тестового пользователя'
 ZERO = 0
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -50,7 +50,7 @@ class PostsViewsTests(TestCase):
             post.append(Post(
                 author=cls.user,
                 group=cls.group2,
-                text=f'Тестовый пост тестового пользователя в тестовой группе',
+                text='Тестовый пост тестового пользователя',
             )
             ),
 
@@ -74,7 +74,7 @@ class PostsViewsTests(TestCase):
         cache.clear()
 
     def test_posts_urls_show_correct_context(self):
-        """Проверка URL-адресов на правильное использование шаблонов""" 
+        """Проверка URL-адресов на правильное использование шаблонов"""
         group = PostsViewsTests.group
         user = PostsViewsTests.user
         post = PostsViewsTests.post
@@ -105,7 +105,7 @@ class PostsViewsTests(TestCase):
         cache.clear()
 
     def test_index_page_show_correct_context(self):
-        """Проверка шаблона главной страницы""" 
+        """Проверка шаблона главной страницы"""
         response = self.auth_client.get(reverse('posts:index'))
         context_post = response.context['page_obj'][ZERO]
         post_author = context_post.author.username
@@ -138,7 +138,7 @@ class PostsViewsTests(TestCase):
         )
 
     def test_profile_page_show_correct_context(self):
-        """Шаблон post_detail сформирован с правильным контекстом.""" 
+        """Шаблон post_detail сформирован с правильным контекстом."""
         user = PostsViewsTests.user
         response = self.auth_client.get(
             reverse('posts:profile', kwargs={'username': user.username})
@@ -157,8 +157,8 @@ class PostsViewsTests(TestCase):
         )
 
     def test_post_detail_page_show_correct_context(self):
-        """Шаблон редактирования поста create_post сформирован 
-        с правильным контекстом. """ 
+        """Шаблон редактирования поста create_post сформирован
+        с правильным контекстом. """
         post = PostsViewsTests.post
         response = self.auth_client.get(
             reverse('posts:post_detail', kwargs={'post_id': post.pk})
@@ -175,8 +175,8 @@ class PostsViewsTests(TestCase):
         )
 
     def test_post_create_show_correct_context(self):
-        """Шаблон создания поста create_post сформирован 
-        с правильным контекстом. """ 
+        """Шаблон создания поста create_post сформирован
+        с правильным контекстом. """
         response = self.auth_client.get(reverse('posts:post_create'))
         form_fields = {
             'text': forms.fields.CharField,
@@ -204,7 +204,7 @@ class PostsViewsTests(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_posts_pages_correct_paginator_work(self):
-        """Проверка корректной работы paginator""" 
+        """Проверка корректной работы paginator"""
         group = PostsViewsTests.group2
         user = PostsViewsTests.user
         VERY_MAGIC_NUMBER = 10
@@ -227,8 +227,8 @@ class PostsViewsTests(TestCase):
                 )
 
     def test_post_correct_exist(self):
-        """Созданный пост отобразился на главной, на странице группы, 
-        в профиле пользователя.""" 
+        """Созданный пост отобразился на главной, на странице группы,
+        в профиле пользователя."""
         group = PostsViewsTests.group
         user = PostsViewsTests.user
         post = PostsViewsTests.post
