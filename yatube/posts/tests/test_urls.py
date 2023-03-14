@@ -57,9 +57,6 @@ class PostsURLsTests(TestCase):
         address = reverse("posts:post_edit", kwargs={"post_id": post_id})
         guest_response = self.guest_client.get(address, follow=True)
         auth_response = self.auth_client.get(address)
-        auth_not_author_response = (
-            self.auth_client_not_author.get(address)
-        )
         self.assertRedirects(
             guest_response,
             f'/auth/login/?next=/posts/{post.pk}/edit/'

@@ -143,7 +143,6 @@ class PostsViewsTests(TestCase):
         )
         context_post = response.context['page_obj'][ZERO]
         post_author = context_post.author.username
-        post_group = context_post.group.title
         post_text = context_post.text
         context_author = response.context['author'].username
         self.assertEqual(post_author, 'test_user')
