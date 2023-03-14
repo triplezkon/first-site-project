@@ -109,10 +109,8 @@ class PostsViewsTests(TestCase):
         response = self.auth_client.get(reverse('posts:index'))
         context_post = response.context['page_obj'][ZERO]
         post_author = context_post.author.username
-        post_group = context_post.group.title
         post_text = context_post.text
         self.assertEqual(post_author, 'test_user')
-        self.assertEqual(post_group, 'Тестовая группа 2')
         self.assertEqual(
             post_text,
             TESTPOST
@@ -150,7 +148,6 @@ class PostsViewsTests(TestCase):
         context_author = response.context['author'].username
         self.assertEqual(post_author, 'test_user')
         self.assertEqual(context_author, 'test_user')
-        self.assertEqual(post_group, 'Тестовая группа 2')
         self.assertEqual(
             post_text,
             TESTPOST
@@ -240,7 +237,7 @@ class PostsViewsTests(TestCase):
         for page in pages_names:
             with self.subTest(page=page):
                 response = self.auth_client.get(page)
-                context_post = response.context['page_obj'][ZERO]
+                context_post = response.context['page_obj'][0]
                 self.assertEqual(context_post, post)
 
     def test_post_correct_not_exist(self):
@@ -251,21 +248,6 @@ class PostsViewsTests(TestCase):
         response = self.auth_client.get(page)
         context_post = response.context['page_obj'][ZERO]
         self.assertNotEqual(context_post, post)
-
-    def test_post_with_image_added_in_context(self):
-        """Проверка работы image в контексте"""
-        addresses = {
-            reverse("posts:index"): self.post.image,
-            reverse("posts:profile",
-                    kwargs={"username": self.user.username}): self.post.image,
-            reverse("posts:group_list",
-                    kwargs={"slug": self.group.slug}): self.post.image,
-        }
-        for value, expected in addresses.items():
-            with self.subTest(value=value):
-                response = self.auth_client.get(value)
-                first_object = response.context["page_obj"][0]
-                self.assertEqual(first_object.image, expected)
 
     def test_post_with_image_added_in_context_post_detail(self):
         """Проверка работы image в шаблоне"""

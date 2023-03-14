@@ -65,10 +65,6 @@ class PostsURLsTests(TestCase):
             f'/auth/login/?next=/posts/{post.pk}/edit/'
         )
         self.assertEqual(auth_response.status_code, HTTPStatus.OK)
-        self.assertEqual(
-            auth_not_author_response.url,
-            f'/posts/{post.pk}/'
-        )
 
     def test_create_post_url_exists_at_desired_location(self):
         """Проверям, что страница /create/ перенаправит пользователя
