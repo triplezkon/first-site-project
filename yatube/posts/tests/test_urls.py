@@ -54,7 +54,7 @@ class PostsURLsTests(TestCase):
         """Проверяем, что страницы доступны авторизованному пользователю."""
         post = PostsURLsTests.post
         post_id = self.post.id
-        address = reverse("posts:post_edit", kwargs={"post_id": post_id})
+        address = reverse('posts:post_edit', kwargs={'post_id': post_id})
         guest_response = self.guest_client.get(address, follow=True)
         auth_response = self.auth_client.get(address)
         self.assertRedirects(

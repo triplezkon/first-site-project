@@ -12,15 +12,15 @@ class Group(models.Model):
         db_index=True,
         verbose_name='URL',
     )
-    description = models.TextField(verbose_name="Описание группы")
+    description = models.TextField(verbose_name='Описание группы')
 
     class Meta:
         indexes = [
-            models.Index(fields=["title", "slug", "description"]),
-            models.Index(fields=["slug"], name="slug_idx"),
+            models.Index(fields=['title', 'slug', 'description']),
+            models.Index(fields=['slug'], name='slug_idx'),
         ]
-        verbose_name = "Группа"
-        verbose_name_plural = "Группы"
+        verbose_name = 'Группа'
+        verbose_name_plural = 'Группы'
 
     def __str__(self) -> str:
         return self.title
@@ -70,26 +70,26 @@ class Comment(models.Model):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name="comments"
+        related_name='comments'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="comments",
-        verbose_name="Автор комментария"
+        related_name='comments',
+        verbose_name='Автор комментария'
     )
     text = models.TextField(
-        verbose_name="Текст комментария"
+        verbose_name='Текст комментария'
     )
     created = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Дата публикации комментария"
+        verbose_name='Дата публикации комментария'
     )
 
     class Meta:
-        ordering = ["-created"]
-        verbose_name = "Комментарий"
-        verbose_name_plural = "Комментарии"
+        ordering = ['-created']
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return self.text
@@ -99,22 +99,22 @@ class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="follower",
-        verbose_name="Имя подписчика",
+        related_name='follower',
+        verbose_name='Имя подписчика',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="following",
-        verbose_name="Имя автора",
+        related_name='following',
+        verbose_name='Имя автора',
     )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["user", "author"],
-                name="unique_follow"
+                fields=['user', 'author'],
+                name='unique_follow'
             )
         ]
-        verbose_name = "Подписчик"
-        verbose_name_plural = "Подписчики"
+        verbose_name = 'Подписчик'
+        verbose_name_plural = 'Подписчики'

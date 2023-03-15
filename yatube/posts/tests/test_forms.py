@@ -1,7 +1,8 @@
 from django.test import Client, TestCase
 from django.urls import reverse
-from posts.models import Group, Post, User
+from posts.models import Group, Post, User, Comment
 from django.core.cache import cache
+from http import HTTPStatus
 
 
 class PostsFormsTests(TestCase):
@@ -89,3 +90,25 @@ class PostsFormsTests(TestCase):
             0,
             'В старой группе есть посты',
         )
+
+    def test_add_comments_by_authorized_client(self):
+        self.post = Post.objects.create(
+            author=self.user,
+            text='Тестовый пост',
+        )
+        comment_count = Comment.objects.count()
+        form_data = {
+            'text': 'Текст комментария',
+        }
+        response = self.auth_client.post(
+            reverse('posts:add_comment', kwargs={'post_id': self.post.id}),
+            data=form_data,
+            follow=True
+        )
+        last_comment = response.context['post']
+        comment = last_comment.comments.last()
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', kwargs={'post_id': self.post.id}))
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertEqual(comment.text, form_data['text'])

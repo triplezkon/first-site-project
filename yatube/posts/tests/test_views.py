@@ -283,10 +283,11 @@ class FollowViewTest(TestCase):
         cache.clear()
 
     def test_autorized_user_can_follow(self):
+        """Проверка на возможность авторизованному пользователю подписаться"""
         follow_count = Follow.objects.count()
         response = (self.auth_client.get(
-            reverse("posts:profile_follow",
-                    kwargs={"username": self.author.username})))
+            reverse('posts:profile_follow',
+                    kwargs={'username': self.author.username})))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(Follow.objects.count(), follow_count + 1)
         self.assertTrue(Follow.objects.filter(
@@ -294,12 +295,13 @@ class FollowViewTest(TestCase):
         ).exists())
 
     def test_autorized_user_can_unfollow(self):
+        """Проверка на возможность авторизованному пользователю отписаться"""
         author = self.user
         Follow.objects.create(user=self.user, author=author)
         follow_count = Follow.objects.count()
         response = (self.auth_client.
-                    get(reverse("posts:profile_unfollow",
-                        kwargs={"username": author.username})))
+                    get(reverse('posts:profile_unfollow',
+                        kwargs={'username': author.username})))
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(Follow.objects.count(), follow_count - 1)
         self.assertFalse(Follow.objects.filter(
@@ -307,21 +309,24 @@ class FollowViewTest(TestCase):
         ).exists())
 
     def test_new_post_appear_on_follower_page(self):
+        """Новая запись пользователя появляется в ленте тех,
+        кто на него подписан"""
         self.post = Post.objects.create(
-            text="Тестовый текст", author=self.author
+            text='Тестовый текст', author=self.author
         )
         Follow.objects.create(author=self.author, user=self.user)
-        response = self.auth_client.get(reverse("posts:follow_index"))
+        response = self.auth_client.get(reverse('posts:follow_index'))
         self.assertEqual(response.context["page_obj"][0], self.post)
 
     def test_new_post_does_not_appear_on_follower_page(self):
+        """Новая запись не появляется в ленте тех, кто не подписан."""
         self.post = Post.objects.create(
-            text="Тестовый текст", author=self.author
+            text='Тестовый текст', author=self.author
         )
         Follow.objects.create(author=self.author, user=self.user)
         self.second_user = User.objects.create_user(
-            username="username",
+            username='username',
         )
         self.auth_client.force_login(self.second_user)
-        response = self.auth_client.get(reverse("posts:follow_index"))
-        self.assertEqual(len(response.context["page_obj"]), 0)
+        response = self.auth_client.get(reverse('posts:follow_index'))
+        self.assertEqual(len(response.context['page_obj']), 0)

@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.conf import settings
+from django.views.decorators.cache import cache_page
 from posts.forms import PostForm, CommentForm
 from posts.models import Group, Post, Follow
 from .models import Post, Group, User
@@ -13,6 +14,7 @@ def paginate_page(request, posts_qs):
     return paginator.get_page(page_number)
 
 
+@cache_page(20, key_prefix='index_page')
 def index(request):
     posts = Post.objects.select_related(
         'group', 'author')
@@ -45,13 +47,16 @@ def profile(request, username):
     page_obj = paginator.get_page(
         request.GET.get('page')
     )
-    following = None
-    if request.user.is_authenticated:
-        following = author.following.filter(user=request.user).exists()
+    following = (
+        request.user.is_authenticated
+        and request.user != author
+        and author.following.filter(user=request.user).exists()
+    )
     template = 'posts/profile.html'
     context = {
-        'page_obj': page_obj,
         'author': author,
+        'username': username,
+        'page_obj': page_obj,
         'following': following
     }
     return render(request, template, context)
@@ -60,18 +65,12 @@ def profile(request, username):
 def post_detail(request, post_id):
     template = 'posts/post_detail.html'
     post = get_object_or_404(Post, id=post_id)
-    post_list = Post.objects.select_related(
-        'group'
-    ).filter(
-        author_id=post.author
-    )
-    post_number = post_list.count()
+    posts_count = post.author.posts.count()
     form = CommentForm(request.POST or None)
     comments = post.comments.all()
     context = {
         'post': post,
-        'post_list': post_list,
-        'post_number': post_number,
+        'posts_count': posts_count,
         'form': form,
         'comments': comments
     }
@@ -131,9 +130,9 @@ def follow_index(request):
     posts = Post.objects.filter(author__following__user=request.user)
     page_obj = paginate_page(request, posts)
     context = {
-        "page_obj": page_obj,
+        'page_obj': page_obj,
     }
-    return render(request, "posts/follow.html", context)
+    return render(request, 'posts/follow.html', context)
 
 
 @login_required
@@ -144,7 +143,7 @@ def profile_follow(request, username):
             user_id=request.user.id,
             author_id=user.id
         )
-    return redirect("posts:profile", username=username)
+    return redirect('posts:profile', username=username)
 
 
 @login_required
