@@ -71,6 +71,10 @@ DATABASES = {
     }
 }
 
+ALLOWED_HOSTS = [
+    'www.zukkel.pythonanywhere.com',
+    'zukkel.pythonanywhere.com',
+] 
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
