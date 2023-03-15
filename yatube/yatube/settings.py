@@ -74,6 +74,7 @@ DATABASES = {
 ALLOWED_HOSTS = [
     'www.zukkel.pythonanywhere.com',
     'zukkel.pythonanywhere.com',
+    '127.0.0.1'
 ] 
 
 # Password validation
